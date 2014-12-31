@@ -1,5 +1,13 @@
-The program automatically downloads the required jars given the configuration file. The path of the configuration file is set in APP_INFO_FILEPATH in AppLauncher.java
+
+# AutoUpdater
+
+Generic autoupdate component used by HubTurbo.
+
+It automatically downloads the required jars specified in the configuration file. The path of the configuration file is set in `APP_INFO_FILEPATH` in `AppLauncher.java`.
+
 Format of configuration file:
+
+```xml
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <application URI=path-of-xml-file-on-server appName="application name">
 	<mainJAR>path to main jar</MainJar>
@@ -15,5 +23,6 @@ Format of configuration file:
 		</component>
 	</components>
 </application>
+```
 
-The program can be distributed without its initial configuration file. If distributed without the configuration file, the program will download the file from the path set by the constant DEFAULT_XML_PATH in htlauncher.updater.UpdateDataManager.java
+The program can be distributed without its initial configuration file. In that case the program will download the file from the path set by the constant `DEFAULT_XML_PATH` in `htlauncher.updater.UpdateDataManager.java`.
