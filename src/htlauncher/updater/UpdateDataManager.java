@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 public class UpdateDataManager {
-	protected static final String DEFAULT_XML_PATH = "https://raw.githubusercontent.com/naomilwx/JavaAutoUpdater/master/HubTurbo.xml";
+	protected static final String DEFAULT_XML_PATH = "https://raw.githubusercontent.com/HubTurbo/AutoUpdater/master/HubTurbo.xml";
 	protected static final String UPDATE_FOLDER = "update/";
 	protected static final String LAUNCH_FOLDER = "app/";
 	protected static final String UPDATER_INFO_FILEPATH = "updater_data";
