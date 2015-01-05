@@ -34,8 +34,10 @@ public class UpdateManager {
 
 	/**
 	 * Displays the progress bar and starts the update process.
+	 * @param firstRun
+	 * @return
 	 */
-	public void runUpdate(boolean firstRun) {
+	public boolean runUpdate(boolean firstRun) {
 
 		// Invalidate the current version of the application
 		applicationUpdated = false;
@@ -45,7 +47,7 @@ public class UpdateManager {
 				downloadProgressDisplay.showProgressWindow();
 			}
 
-			runRequiredUpdate();
+			boolean success = runRequiredUpdate();
 
 			if (firstRun) {
 				downloadProgressDisplay.hideProgressWindow();
@@ -54,12 +56,20 @@ public class UpdateManager {
 				Utilities.showMessageOnTop("Application updated", storageManager.getAppName()
 						+ " has been successfully updated. Restart application to get the latest update.");
 			}
+
+			return success;
 		}
+		return false;
 	}
 
-	private void runRequiredUpdate() {
+	/**
+	 * Updates the app descriptor, then the app itself
+	 * @return true if successful
+	 */
+	private boolean runRequiredUpdate() {
 		updateAppDesc();
-		updateAppComponents();
+		boolean success = updateAppComponents();
+		return success;
 	}
 
 	/**
@@ -79,8 +89,9 @@ public class UpdateManager {
 
 	/**
 	 * Updates the application itself.
+	 * @return true if successful
 	 */
-	public void updateAppComponents() {
+	public boolean updateAppComponents() {
 		boolean success = true;
 
 		for (ComponentDescriptor component : storageManager.getAppComponents()) {
@@ -93,9 +104,11 @@ public class UpdateManager {
 		if (success) {
 			storageManager.saveUpdaterData();
 			downloader.removeBackups();
+			return true;
 		} else {
 			downloader.rollBack();
 			applicationUpdated = false;
+			return false;
 		}
 	}
 
@@ -135,6 +148,14 @@ public class UpdateManager {
 
 	public String getAppLaunchPath() {
 		return storageManager.getAppLaunchPath();
+	}
+	
+	public String getDownloadedVersion(String name) {
+		return storageManager.getDownloadedVersion(name).toString();
+	}
+	
+	public String getAppName() {
+		return storageManager.getAppName();
 	}
 
 	/**
