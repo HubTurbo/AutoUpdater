@@ -1,17 +1,20 @@
 package htlauncher.utilities;
 
 import java.net.URI;
+
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlSeeAlso;
 
 @XmlRootElement(name="component")
+@XmlSeeAlso({Version.class})
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ComponentDescriptor {
 	private String name;
 	private URI localURI;
 	private URI serverURI;
-	private double version;
+	private Version version;
 	
 	public String getComponentName(){
 		return name;
@@ -21,11 +24,11 @@ public class ComponentDescriptor {
 		this.name = name;
 	}
 	
-	public double getVersion(){
+	public Version getVersion(){
 		return version;
 	}
 	
-	public void setVersion(double version){
+	public void setVersion(Version version){
 		this.version = version;
 	}
 	

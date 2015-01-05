@@ -3,6 +3,7 @@ package htlauncher.updater;
 import htlauncher.utilities.AppDescriptor;
 import htlauncher.utilities.ComponentDescriptor;
 import htlauncher.utilities.Utilities;
+import htlauncher.utilities.Version;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -49,7 +50,7 @@ public class StorageManager {
 	private AppDescriptor appDescriptor;
 
 	// All versions that have already been downloaded
-	private HashMap<String, Double> downloadedVersions = new HashMap<String, Double>();
+	private HashMap<String, Version> downloadedVersions = new HashMap<>();
 
 	public StorageManager(String appDescPath) {
 		appDescFile = new File(appDescPath);
@@ -116,7 +117,7 @@ public class StorageManager {
 				String[] lineArr = line.split(SPLIT_MARKER);
 				if (lineArr.length == 2) {
 					String name = lineArr[0];
-					Double ver = Double.parseDouble(lineArr[1]);
+					Version ver = new Version(lineArr[1]);
 					downloadedVersions.put(name, ver);
 				}
 			}
@@ -152,14 +153,14 @@ public class StorageManager {
 		}
 	}
 
-	public void updateDownloadedVersion(String name, double version) {
+	public void updateDownloadedVersion(String name, Version version) {
 		downloadedVersions.put(name, version);
 	}
 
-	public double getDownloadedVersion(String name) {
-		Double ver = downloadedVersions.get(name);
+	public Version getDownloadedVersion(String name) {
+		Version ver = downloadedVersions.get(name);
 		if (ver == null) {
-			return -1;
+			return new Version();
 		}
 		return ver;
 	}
@@ -174,8 +175,8 @@ public class StorageManager {
 			fileWriter.write(serverAppDescURI.toString());
 			fileWriter.write("\n");
 
-			for (Entry<String, Double> entry : downloadedVersions.entrySet()) {
-				String entryString = entry.getKey() + SPLIT_MARKER + entry.getValue();
+			for (Entry<String, Version> entry : downloadedVersions.entrySet()) {
+				String entryString = entry.getKey() + SPLIT_MARKER + entry.getValue().toString();
 				fileWriter.write(entryString);
 				fileWriter.write("\n");
 			}

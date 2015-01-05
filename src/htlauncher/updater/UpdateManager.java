@@ -2,6 +2,7 @@ package htlauncher.updater;
 
 import htlauncher.utilities.ComponentDescriptor;
 import htlauncher.utilities.Utilities;
+import htlauncher.utilities.Version;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -105,11 +106,11 @@ public class UpdateManager {
 	 */
 	public boolean updateComponent(ComponentDescriptor component) {
 		String name = component.getComponentName();
-		double latestVersion = component.getVersion();
-		double currentVersion = storageManager.getDownloadedVersion(name);
+		Version latestVersion = component.getVersion();
+		Version currentVersion = storageManager.getDownloadedVersion(name);
 		boolean success = true;
 
-		if (latestVersion > currentVersion) {
+		if (latestVersion.compareTo(currentVersion) > 0) { // latest > current
 			downloadProgressDisplay.updateDownloadingComponent(component.getComponentName());
 
 			// Update jar for component from server
