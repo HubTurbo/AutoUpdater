@@ -1,5 +1,6 @@
 package htlauncher.updater;
 
+import htlauncher.launcher.AppLauncher;
 import htlauncher.utilities.AppDescriptor;
 import htlauncher.utilities.ComponentDescriptor;
 import htlauncher.utilities.Utilities;
@@ -25,9 +26,6 @@ import java.util.Map.Entry;
  * An interface to all the local data created and used by the updater.
  */
 public class StorageManager {
-	
-	// URL from which the app descriptor XML file is downloaded.
-	private static final String APP_DESC_XML_URL = "https://raw.githubusercontent.com/HubTurbo/AutoUpdater/master/HubTurbo.xml";
 	
 	// Temporary location where downloaded files are placed.
 	public static final String UPDATE_FOLDER = "update/";
@@ -232,7 +230,7 @@ public class StorageManager {
 	public URI getServerAppDescURI() {
 		if (serverAppDescURI == null) {
 			try {
-				serverAppDescURI = new URI(APP_DESC_XML_URL);
+				serverAppDescURI = new URI(AppLauncher.APP_DESC_XML_URL);
 			} catch (URISyntaxException e) {
 				e.printStackTrace();
 			}

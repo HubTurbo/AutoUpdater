@@ -13,8 +13,11 @@ import java.util.HashMap;
  */
 public class AppLauncher {
 
-	// The path to the data file containing the application descriptor
+	// Relative path to the data file containing the application descriptor
 	public static final String APP_DESC_FILEPATH = "HubTurbo.xml";
+	
+	// URL from which the app descriptor XML file is downloaded.
+	public static final String APP_DESC_XML_URL = "https://raw.githubusercontent.com/HubTurbo/AutoUpdater/master/HubTurbo.xml";
 	
 	// If true, the app descriptor will be downloaded and updated.
 	// For use in testing.
