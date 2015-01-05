@@ -1,5 +1,6 @@
 package htlauncher.updater;
 
+import htlauncher.launcher.AppLauncher;
 import htlauncher.utilities.ComponentDescriptor;
 import htlauncher.utilities.Utilities;
 import htlauncher.utilities.Version;
@@ -67,7 +68,9 @@ public class UpdateManager {
 	 * @return true if successful
 	 */
 	private boolean runRequiredUpdate() {
-		updateAppDesc();
+		if (AppLauncher.UPDATE_APP_DESC) {
+			updateAppDesc();
+		}
 		boolean success = updateAppComponents();
 		return success;
 	}

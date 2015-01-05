@@ -16,6 +16,10 @@ public class AppLauncher {
 	// The path to the data file containing the application descriptor
 	public static final String APP_DESC_FILEPATH = "HubTurbo.xml";
 	
+	// If true, the app descriptor will be downloaded and updated.
+	// For use in testing.
+	public static final boolean UPDATE_APP_DESC = true;
+	
 	private UpdateManager updater;
 	
 	private HashMap<String, String> commandLineArgs = new HashMap<>();
