@@ -1,52 +1,55 @@
 package htlauncher.updater;
 
+/**
+ * POD class for tracking the progress of an arbitrary download.
+ */
 public class DownloadProgress {
 	private long totalDownloadBytes;
 	private long bytesDownloaded;
 	private boolean downloadCompleted;
 	private boolean downloadSuccess;
-	
-	public DownloadProgress(){
+
+	public DownloadProgress() {
 		downloadSuccess = true;
 		downloadCompleted = false;
 	}
-	
-	public long getTotalDownloadBytes(){
+
+	public long getTotalDownloadBytes() {
 		return totalDownloadBytes;
 	}
-	
-	public void setTotalDownloadBytes(long bytes){
+
+	public void setTotalDownloadBytes(long bytes) {
 		this.totalDownloadBytes = bytes;
 	}
-	
-	public long getBytesDownloaded(){
+
+	public long getBytesDownloaded() {
 		return bytesDownloaded;
 	}
-	
-	public void setBytesDownloaded(long bytes){
+
+	public void setBytesDownloaded(long bytes) {
 		this.bytesDownloaded = bytes;
 	}
-	
-	public boolean getDownloadCompleted(){
+
+	public boolean getDownloadCompleted() {
 		return downloadCompleted;
 	}
-	
-	public void setDownloadCompleted(boolean completed){
+
+	public void setDownloadCompleted(boolean completed) {
 		this.downloadCompleted = completed;
 	}
-	
-	public boolean getDownloadSuccess(){
+
+	public boolean getDownloadSuccess() {
 		return downloadSuccess;
 	}
-	
-	public void setDownloadSuccess(boolean success){
+
+	public void setDownloadSuccess(boolean success) {
 		this.downloadSuccess = success;
 	}
-	
-	public double getDownloadedPercent(){
-		if(totalDownloadBytes == 0){
+
+	public double getDownloadedPercent() {
+		if (totalDownloadBytes == 0) {
 			return 0;
 		}
-		return 100.0 * bytesDownloaded /totalDownloadBytes;
+		return 100.0 * bytesDownloaded / totalDownloadBytes;
 	}
 }

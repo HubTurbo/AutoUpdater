@@ -79,7 +79,7 @@ public class AppDescriptor {
 		this.appName = name;
 	}
 	
-	public URI getserverAppDescriptorURI(){
+	public URI getServerAppDescriptorURI(){
 		return serverAppDescriptorURI;
 	}
 	

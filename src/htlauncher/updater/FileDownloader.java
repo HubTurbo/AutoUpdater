@@ -18,7 +18,11 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map.Entry;
-
+/**
+ * A utility class for downloading a file from a given URL.
+ * Backs up files it overwrites and provides functions for rolling
+ * restoring them if the download is unsuccessful.
+ */
 public class FileDownloader {
 	public static final int BUFFER_SIZE = 2048;
 	public static final int CONNECTION_TIMEOUT = 15000;
@@ -28,6 +32,60 @@ public class FileDownloader {
 
 	public FileDownloader() {
 		backups = new HashMap<String, String>();
+	}
+
+	public void rollBack() {
+		for (Entry<String, String> entry : backups.entrySet()) {
+			String backupPath = entry.getValue();
+			String originalPath = entry.getKey();
+			moveFile(backupPath, originalPath);
+		}
+	}
+
+	public void removeBackups() {
+		for (String backupPath : backups.values()) {
+			File backupFile = new File(backupPath);
+			if (backupFile.exists()) {
+				backupFile.delete();
+			}
+		}
+		backups = new HashMap<String, String>();
+	}
+
+	public void downloadFile(URI source, URI destination, DownloadProgress progress) {
+		BufferedInputStream buffInput = null;
+		BufferedOutputStream buffOut = null;
+		try {
+			buffInput = setupStreamFromSource(source, progress);
+			buffOut = setupStreamToDestination(destination, progress);
+	
+			download(buffInput, buffOut, progress);
+			progress.setDownloadCompleted(true);
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+			progress.setDownloadSuccess(false);
+			Utilities.showError("Connection failed", 
+					"Cannot connect to download server."
+					+ " Application Launcher files might be corrupted!");
+		} catch (SocketTimeoutException e) {
+			e.printStackTrace();
+			progress.setDownloadSuccess(false);
+			Utilities.showMessage("Application Update Failed", 
+					"Connection to server timeout while updates were downloaded.");
+		} catch (FileSystemException e) {
+			e.printStackTrace();
+			progress.setDownloadSuccess(false);
+			Utilities.showWarning("Download Failed", e.getMessage()
+					+ "Application updates download failed"
+					+ "Please check the application directory's permissions");
+		} catch (IOException e) {
+			e.printStackTrace();
+			progress.setDownloadSuccess(false);
+			Utilities.showWarning("Download failed", e.getMessage()
+					+ "Application updates download failed");
+		} finally {
+			closeIOStreams(buffInput, buffOut);
+		}
 	}
 
 	private BufferedInputStream setupStreamFromSource(URI source,
@@ -56,30 +114,11 @@ public class FileDownloader {
 		return buffOut;
 	}
 
-	protected void rollBack() {
-		for (Entry<String, String> entry : backups.entrySet()) {
-			String backupPath = entry.getValue();
-			String originalPath = entry.getKey();
-			moveFile(backupPath, originalPath);
-		}
-	}
-
-	protected void removeBackups() {
-		for (String backupPath : backups.values()) {
-			File backupFile = new File(backupPath);
-			if (backupFile.exists()) {
-				backupFile.delete();
-			}
-		}
-		backups = new HashMap<String, String>();
-	}
-
 	private void moveFile(String source, String dest) {
 		try {
 			Files.move(Paths.get(source), Paths.get(dest),
 					StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -123,45 +162,7 @@ public class FileDownloader {
 			}
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-	}
-
-	public void downloadFile(URI source, URI destination,
-			DownloadProgress progress) {
-		BufferedInputStream buffInput = null;
-		BufferedOutputStream buffOut = null;
-		try {
-			buffInput = setupStreamFromSource(source, progress);
-			buffOut = setupStreamToDestination(destination, progress);
-
-			download(buffInput, buffOut, progress);
-			progress.setDownloadCompleted(true);
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-			progress.setDownloadSuccess(false);
-			Utilities.showError("Connection failed", 
-					"Cannot connect to download server."
-					+ " Application Launcher files might be corrupted!");
-		} catch (SocketTimeoutException e) {
-			e.printStackTrace();
-			progress.setDownloadSuccess(false);
-			Utilities.showMessage("Application Update Failed", 
-					"Connection to server timeout while updates were downloaded.");
-		} catch (FileSystemException e) {
-			e.printStackTrace();
-			progress.setDownloadSuccess(false);
-			Utilities.showWarning("Download Failed", e.getMessage()
-					+ "Application updates download failed"
-					+ "Please check the application directory's permissions");
-		} catch (IOException e) {
-			e.printStackTrace();
-			progress.setDownloadSuccess(false);
-			Utilities.showWarning("Download failed", e.getMessage()
-					+ "Application updates download failed");
-		} finally {
-			closeIOStreams(buffInput, buffOut);
 		}
 	}
 

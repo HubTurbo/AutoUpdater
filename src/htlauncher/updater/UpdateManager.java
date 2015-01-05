@@ -1,6 +1,5 @@
 package htlauncher.updater;
 
-
 import htlauncher.utilities.ComponentDescriptor;
 import htlauncher.utilities.Utilities;
 
@@ -10,85 +9,111 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-public class UpdateManager {	
-	private UpdateDataManager dataManager;
+/**
+ * A facade for the other components.
+ */
+public class UpdateManager {
+
+	private DownloadProgressDisplay downloadProgressDisplay;
+	private StorageManager storageManager;
 	private FileDownloader downloader;
-	private URI appInfoURI;
-	private DownloadProgressDisplay downloadProgress;
+	
+	// The path to the application descriptor file
+	private URI appDescURI;
+
+	// Will be set to true if an updated version of the application was found and downloaded.
 	private boolean applicationUpdated = false;
-	
-	public UpdateManager(String appInfoPath) throws URISyntaxException{
-		setupComponents(appInfoPath);
-		this.appInfoURI = new URI(appInfoPath);
-	}
-	
-	public void setupComponents(String appPath){
-		downloadProgress = new DownloadProgressDisplay();
-		dataManager = new UpdateDataManager(appPath);
+
+	public UpdateManager(String appDescPath) throws URISyntaxException {
+		downloadProgressDisplay = new DownloadProgressDisplay();
+		storageManager = new StorageManager(appDescPath);
 		downloader = new FileDownloader();
+		appDescURI = new URI(appDescPath);
 	}
-	
-	public void runUpdate(boolean firstRun){
+
+	/**
+	 * Displays the progress bar and starts the update process.
+	 */
+	public void runUpdate(boolean firstRun) {
+
+		// Invalidate the current version of the application
 		applicationUpdated = false;
-		if(checkServerConnection()){
-			if(firstRun){
-				downloadProgress.showProgressWindow();
+		
+		if (checkServerConnection()) {
+			if (firstRun) {
+				downloadProgressDisplay.showProgressWindow();
 			}
+
 			runRequiredUpdate();
-			if(firstRun){
-				downloadProgress.hideProgressWindow();
-				dataManager.moveLastDownload();
-			}else{
-				if(applicationUpdated == true){
-					Utilities.showMessageOnTop("Application updated", 
-							dataManager.getAppName() +" has been successfully updated. Restart application to get the latest update.");
-				}
+
+			if (firstRun) {
+				downloadProgressDisplay.hideProgressWindow();
+				StorageManager.moveLastDownload();
+			} else if (applicationUpdated) {
+				Utilities.showMessageOnTop("Application updated", storageManager.getAppName()
+						+ " has been successfully updated. Restart application to get the latest update.");
 			}
 		}
 	}
-	
-	private void runRequiredUpdate(){
-		updateAppDetails();
+
+	private void runRequiredUpdate() {
+		updateAppDesc();
 		updateAppComponents();
 	}
-	
-	public void updateAppDetails(){
-		URI serverURI = dataManager.getServerAppInfoURI();
-		//overwrite with file from server
-		boolean success = startDownload(serverURI, appInfoURI, true);
-		if(success){
-			dataManager.loadAppData();
-		}else{
+
+	/**
+	 * Updates the XML file containing the application descriptor.
+	 * Overwrites the current XML file.
+	 */
+	public void updateAppDesc() {
+		URI serverURI = storageManager.getServerAppDescURI();
+
+		boolean success = startDownload(serverURI, appDescURI, true);
+		if (success) {
+			storageManager.loadAppDesc();
+		} else {
 			downloader.rollBack();
 		}
 	}
-	
-	public void updateAppComponents(){
+
+	/**
+	 * Updates the application itself.
+	 */
+	public void updateAppComponents() {
 		boolean success = true;
-		for(ComponentDescriptor component: dataManager.getAppComponents()){
+
+		for (ComponentDescriptor component : storageManager.getAppComponents()) {
 			success = updateComponent(component);
-			if(!success){
+			if (!success) {
 				break;
 			}
 		}
-		if(success){
-			dataManager.saveUpdaterData();
+		
+		if (success) {
+			storageManager.saveUpdaterData();
 			downloader.removeBackups();
-		}else{
+		} else {
 			downloader.rollBack();
 			applicationUpdated = false;
 		}
 	}
-	
-	public boolean updateComponent(ComponentDescriptor component){
+
+	/**
+	 * Updates a single component identified by the given component descriptor.
+	 * @param component
+	 * @return a boolean value indicating success.
+	 */
+	public boolean updateComponent(ComponentDescriptor component) {
 		String name = component.getComponentName();
-		double latestVer = component.getVersion();
-		double currentVer = dataManager.getDownloadedVersion(name);
+		double latestVersion = component.getVersion();
+		double currentVersion = storageManager.getDownloadedVersion(name);
 		boolean success = true;
-		if(latestVer > currentVer){
-			downloadProgress.updateDownloadingComponent(component.getComponentName());
-			//update jar for component from server
-			String compath = UpdateDataManager.UPDATE_FOLDER + component.getLocalURI().toString();
+
+		if (latestVersion > currentVersion) {
+			downloadProgressDisplay.updateDownloadingComponent(component.getComponentName());
+
+			// Update jar for component from server
+			String compath = StorageManager.UPDATE_FOLDER + component.getLocalURI().toString();
 			URI dlURI;
 			try {
 				dlURI = new URI(compath);
@@ -96,47 +121,54 @@ public class UpdateManager {
 				e.printStackTrace();
 				return false;
 			}
+
 			success = startDownload(component.getServerURI(), dlURI, true);
-			if(success){
-				//update success: update downloaded component version
-				dataManager.updateDownloadedVersion(name, latestVer);
+
+			if (success) {
+				storageManager.updateDownloadedVersion(name, latestVersion);
 				applicationUpdated = true;
 			}
 		}
 		return success;
 	}
-	
-	public String getAppLaunchPath(){
-		return dataManager.getAppLaunchPath();
+
+	public String getAppLaunchPath() {
+		return storageManager.getAppLaunchPath();
 	}
-	
-	
-	private boolean startDownload(URI source, URI dest, boolean showProgress){
+
+	/**
+	 * Downloads a file, using the current progress display to show progress.
+	 * @param source
+	 * @param dest
+	 * @param showProgress
+	 * @return a boolean value indicating if the download was successful.
+	 */
+	private boolean startDownload(URI source, URI dest, boolean showProgress) {
 		DownloadProgress progress = new DownloadProgress();
-		if(showProgress){
-			downloadProgress.startProgressDisplay(progress);
+		if (showProgress) {
+			downloadProgressDisplay.startProgressDisplay(progress);
 		}
 		downloader.downloadFile(source, dest, progress);
 		return progress.getDownloadSuccess();
 	}
-	
-	private boolean checkServerConnection(){
+
+	private boolean checkServerConnection() {
 		try {
-			String serverPath = dataManager.getServerAppInfoURI().getHost();
-			if(serverPath == null){
+			String serverPath = storageManager.getServerAppDescURI().getHost();
+			if (serverPath == null) {
 				throw new MalformedURLException();
 			}
-			URL serverURL = new URL ("http", serverPath, 80, "");
+			URL serverURL = new URL("http", serverPath, 80, "");
 			serverURL.openConnection().connect();
 			return true;
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
-			Utilities.showError("Cache Corrupted", "The application launcher's cache has been corrupted! Please delete "+ UpdateDataManager.UPDATER_INFO_FILEPATH);
+			Utilities.showError("Cache Corrupted",
+					"The application launcher's cache has been corrupted! Please delete "
+							+ StorageManager.UPDATER_INFO_FILEPATH);
 			return false;
 		} catch (IOException e) {
 			return false;
 		}
-		
 	}
-	
 }
