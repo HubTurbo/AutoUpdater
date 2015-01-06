@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <application URI="https://raw.githubusercontent.com/HubTurbo/AutoUpdater/master/HubTurbo.xml" appName="HubTurbo">
-	<components>
-    	<component>
-        	<name>HubTurbo</name>
-        	<localURI>HubTurbo.jar</localURI>
-        	<serverURI>https://github.com/HubTurbo/HubTurbo/releases/download/V0.9.0/resource-v0.9.0.jar</serverURI>
-        	<version>
-                <major>0</major>
-                <minor>9</minor>
+    <components>
+        <component>
+            <name>HubTurbo</name>
+            <localURI>HubTurbo.jar</localURI>
+            <serverURI>https://github.com/HubTurbo/HubTurbo/releases/download/V1.0.0/resource-v1.0.0.jar</serverURI>
+            <version>
+                <major>1</major>
+                <minor>0</minor>
                 <patch>0</patch>
             </version>
-    	</component>
-	</components>
+        </component>
+    </components>
     <mainJAR>HubTurbo.jar</mainJAR>
 </application>
