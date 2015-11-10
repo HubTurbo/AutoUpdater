@@ -4,10 +4,10 @@
         <component>
             <name>HubTurbo</name>
             <localURI>HubTurbo.jar</localURI>
-            <serverURI>https://github.com/HubTurbo/HubTurbo/releases/download/V3.12.0/resource-v3.12.0.jar</serverURI>
+            <serverURI>https://github.com/HubTurbo/HubTurbo/releases/download/V3.13.0/resource-v3.13.0.jar</serverURI>
             <version>
                 <major>3</major>
-                <minor>12</minor>
+                <minor>13</minor>
                 <patch>0</patch>
             </version>
         </component>
